@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 2%;
+    --foreground: 0 0% 100%;
+
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 53%;
+
+    --accent: 0 0% 13%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
+    --ring: 0 0% 100%;
+
+    --radius: 0.5rem;
+
+    --text-gray: 0 0% 53%;
+    --card-bg: 0 0% 7%;
+    --bg-color: 0 0% 2%;
+  }
+
+  .dark {
+    --background: 0 0% 2%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 53%;
+    --accent: 0 0% 13%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
+    --ring: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-tajawal overflow-x-hidden;
+  }
+
+  html[dir="rtl"] {
+    direction: rtl;
+  }
+
+  html[dir="ltr"] {
+    direction: ltr;
+  }
+}
+
+@layer components {
+  .nav-btn {
+    @apply bg-primary text-primary-foreground px-5 py-2 rounded-full no-underline font-bold text-sm transition-transform hover:scale-105;
+  }
+
+  .badge {
+    @apply bg-secondary px-4 py-1.5 rounded-full text-xs border border-border inline-block mb-5;
+  }
+
+  .btn {
+    @apply px-8 py-3 rounded-lg no-underline font-bold transition-all duration-300 cursor-pointer border-none hover:scale-105;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground border border-border;
+  }
+
+  .tag {
+    @apply bg-white/20 px-2.5 py-1 rounded text-xs backdrop-blur-sm;
+  }
+
+  .card-gradient {
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  }
+
+  .footer-cta-gradient {
+    background: linear-gradient(135deg, #1a1a1a, #050505);
+  }
+
+  /* Admin styles */
+  .admin-sidebar {
+    @apply w-64 bg-card border-r border-border min-h-screen p-4;
+  }
+
+  .admin-nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors;
+  }
+
+  .admin-nav-item.active {
+    @apply bg-secondary text-foreground;
+  }
+}
+
+@layer utilities {
+  .font-tajawal {
+    font-family: 'Tajawal', sans-serif;
+  }
+}
