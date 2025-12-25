@@ -85,7 +85,7 @@ const ProjectPage = () => {
               key={index}
               src={img}
               alt={`${project.title} - ${index + 1}`}
-              className="h-[60vh] rounded-xl shadow-lg shadow-white/10 flex-shrink-0"
+              className="h-[50vh] md:h-[60vh] w-auto object-contain rounded-xl shadow-lg shadow-white/10 flex-shrink-0"
             />
           ))}
         </div>
