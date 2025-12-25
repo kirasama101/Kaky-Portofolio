@@ -1,16 +1,36 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { getFooterContent, FooterContent } from "@/lib/mockData";
+import DatabaseError from "./DatabaseError";
 
 const FooterCTA = () => {
   const { language } = useLanguage();
   const [content, setContent] = useState<FooterContent | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getFooterContent().then(setContent);
+    setLoading(true);
+    getFooterContent()
+      .then(setContent)
+      .catch((err) => {
+        console.error("Error loading footer content:", err);
+        setError(err.message || "Failed to load content");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  if (!content) return null;
+  if (error) {
+    return <DatabaseError message={error} />;
+  }
+
+  if (loading || !content) {
+    return (
+      <footer className="text-center py-5 text-muted-foreground text-sm">
+        {language === "ar" ? "جاري التحميل..." : "Loading..."}
+      </footer>
+    );
+  }
 
   const isAr = language === "ar";
 

@@ -1,16 +1,36 @@
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useEffect, useState } from "react";
 import { getHeroContent, HeroContent } from "@/lib/mockData";
+import DatabaseError from "./DatabaseError";
 
 const Hero = () => {
   const { language } = useLanguage();
   const [content, setContent] = useState<HeroContent | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getHeroContent().then(setContent);
+    setLoading(true);
+    getHeroContent()
+      .then(setContent)
+      .catch((err) => {
+        console.error("Error loading hero content:", err);
+        setError(err.message || "Failed to load content");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  if (!content) return null;
+  if (error) {
+    return <DatabaseError message={error} />;
+  }
+
+  if (loading || !content) {
+    return (
+      <div className="text-center py-20 px-5">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
 
   const isAr = language === "ar";
 

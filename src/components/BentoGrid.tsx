@@ -2,14 +2,36 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { getProjects, Project } from "@/lib/mockData";
 import ProjectCard from "./ProjectCard";
+import DatabaseError from "./DatabaseError";
 
 const BentoGrid = () => {
   const { t } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProjects().then(setProjects);
+    setLoading(true);
+    getProjects()
+      .then(setProjects)
+      .catch((err) => {
+        console.error("Error loading projects:", err);
+        setError(err.message || "Failed to load projects");
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  if (error) {
+    return <DatabaseError message={error} />;
+  }
+
+  if (loading) {
+    return (
+      <section className="py-12 px-[5%] max-w-[1200px] mx-auto">
+        <div className="text-center text-muted-foreground">Loading projects...</div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 px-[5%] max-w-[1200px] mx-auto">

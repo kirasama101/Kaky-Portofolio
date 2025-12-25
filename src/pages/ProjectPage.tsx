@@ -4,26 +4,47 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { getProject, Project } from "@/lib/mockData";
 import { useLanguage } from "@/i18n/LanguageContext";
 import Navbar from "@/components/Navbar";
+import DatabaseError from "@/components/DatabaseError";
 
 const ProjectPage = () => {
   const { id } = useParams<{ id: string }>();
   const { language, t } = useLanguage();
   const [project, setProject] = useState<Project | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const isAr = language === "ar";
 
   useEffect(() => {
     if (id) {
-      getProject(id).then((p) => setProject(p || null));
+      setLoading(true);
+      getProject(id)
+        .then((p) => setProject(p || null))
+        .catch((err) => {
+          console.error("Error loading project:", err);
+          setError(err.message || "Failed to load project");
+        })
+        .finally(() => setLoading(false));
     }
   }, [id]);
 
-  if (!project) {
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <DatabaseError message={error} />
+      </div>
+    );
+  }
+
+  if (loading || !project) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="flex items-center justify-center h-[60vh]">
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">
+            {isAr ? "جاري التحميل..." : "Loading..."}
+          </p>
         </div>
       </div>
     );
