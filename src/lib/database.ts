@@ -7,20 +7,27 @@ export type { Project, HeroContent, FooterContent };
 // Timeout helper function for Supabase queries
 const withTimeout = async <T>(
   queryPromise: Promise<{ data: T | null; error: any }>,
-  timeoutMs: number = 10000
+  timeoutMs: number = 30000 // Increased to 30 seconds
 ): Promise<{ data: T | null; error: any }> => {
   const timeoutPromise = new Promise<{ data: null; error: any }>((_, reject) => {
     setTimeout(() => {
-      reject(new Error(`Request timed out after ${timeoutMs}ms. Please check your internet connection and try again.`));
+      reject(new Error(`Request timed out after ${timeoutMs}ms. Please check your internet connection and Supabase configuration.`));
     }, timeoutMs);
   });
 
   try {
     return await Promise.race([queryPromise, timeoutPromise]);
   } catch (error) {
-    // If it's a timeout error, throw it
+    // If it's a timeout error, throw it with more context
     if (error instanceof Error && error.message.includes('timed out')) {
-      throw error;
+      const enhancedError = new Error(
+        `Database connection timeout. This could be due to:\n` +
+        `1. Slow internet connection\n` +
+        `2. Supabase service issues\n` +
+        `3. Incorrect Supabase URL or API key\n` +
+        `Please check your .env file and ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are correct.`
+      );
+      throw enhancedError;
     }
     // Otherwise, return the error from the query
     return { data: null, error };
@@ -70,7 +77,7 @@ export const getProjectsList = async (): Promise<Project[]> => {
       .select('id, title, title_en, tag, tag_en, description, description_en, cover_image, span_cols, span_rows, icon, created_at')
       .order('created_at', { ascending: false });
     
-    const result = await withTimeout(queryPromise, 10000);
+    const result = await withTimeout(queryPromise, 30000);
     const { data: projects, error: projectsError } = result;
 
     const duration = Date.now() - startTime;
@@ -163,7 +170,7 @@ export const getProject = async (id: string): Promise<Project | undefined> => {
       .eq('id', id)
       .single();
     
-    const { data: project, error: projectError } = await withTimeout(projectQuery, 10000);
+    const { data: project, error: projectError } = await withTimeout(projectQuery, 30000);
 
     if (projectError) throw projectError;
     if (!project) return undefined;
@@ -182,8 +189,8 @@ export const getProject = async (id: string): Promise<Project | undefined> => {
       .order('display_order', { ascending: true });
 
     const [imagesResult, videosResult] = await Promise.all([
-      withTimeout(imagesQuery, 10000),
-      withTimeout(videosQuery, 10000),
+      withTimeout(imagesQuery, 30000),
+      withTimeout(videosQuery, 30000),
     ]);
 
     if (imagesResult.error) throw imagesResult.error;
@@ -352,7 +359,7 @@ export const getHeroContent = async (): Promise<HeroContent> => {
       .select('*')
       .single();
     
-    const result = await withTimeout(queryPromise, 10000);
+    const result = await withTimeout(queryPromise, 30000);
     const { data, error } = result;
 
     if (error) {
@@ -447,7 +454,7 @@ export const getFooterContent = async (): Promise<FooterContent> => {
       .select('*')
       .single();
     
-    const result = await withTimeout(queryPromise, 10000);
+    const result = await withTimeout(queryPromise, 30000);
     const { data, error } = result;
 
     if (error) {
