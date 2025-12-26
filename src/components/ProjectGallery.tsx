@@ -105,7 +105,8 @@ const ProjectGallery = ({ images, videos = [], projectTitle }: ProjectGalleryPro
                   className="w-full h-full object-cover"
                   muted
                   playsInline
-                  preload="metadata"
+                  preload="none"
+                  poster=""
                 />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/5 transition-colors duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -121,7 +122,7 @@ const ProjectGallery = ({ images, videos = [], projectTitle }: ProjectGalleryPro
 
       {/* Lightbox Modal */}
       <Dialog open={selectedIndex !== null} onOpenChange={(open) => !open && closeLightbox()}>
-        <DialogContent className="max-w-7xl w-full h-[90vh] p-0 bg-black/95 border-none">
+        <DialogContent className="max-w-[95vw] w-full max-h-[95vh] h-[95vh] p-0 bg-black/95 border-none overflow-hidden">
           {currentMedia && (
             <div className="relative w-full h-full flex items-center justify-center">
               {/* Close Button */}
@@ -157,19 +158,21 @@ const ProjectGallery = ({ images, videos = [], projectTitle }: ProjectGalleryPro
               )}
 
               {/* Media Display */}
-              <div className="w-full h-full flex items-center justify-center p-4">
+              <div className="w-full h-full flex items-center justify-center p-8 md:p-12">
                 {currentMedia.type === "image" ? (
                   <img
                     src={currentMedia.url}
                     alt={`${projectTitle} - ${selectedIndex! + 1}`}
-                    className="max-w-full max-h-full object-contain rounded-lg"
+                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg"
+                    style={{ maxWidth: 'calc(100% - 2rem)', maxHeight: 'calc(100% - 8rem)' }}
                   />
                 ) : (
                   <video
                     src={currentMedia.url}
                     controls
                     autoPlay
-                    className="max-w-full max-h-full rounded-lg"
+                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg"
+                    style={{ maxWidth: 'calc(100% - 2rem)', maxHeight: 'calc(100% - 8rem)' }}
                   >
                     Your browser does not support the video tag.
                   </video>

@@ -4,6 +4,29 @@ import type { Project, HeroContent, FooterContent } from './mockData';
 // Re-export types for convenience
 export type { Project, HeroContent, FooterContent };
 
+// Timeout helper function for Supabase queries
+const withTimeout = async <T>(
+  queryPromise: Promise<{ data: T | null; error: any }>,
+  timeoutMs: number = 10000
+): Promise<{ data: T | null; error: any }> => {
+  const timeoutPromise = new Promise<{ data: null; error: any }>((_, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Request timed out after ${timeoutMs}ms. Please check your internet connection and try again.`));
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([queryPromise, timeoutPromise]);
+  } catch (error) {
+    // If it's a timeout error, throw it
+    if (error instanceof Error && error.message.includes('timed out')) {
+      throw error;
+    }
+    // Otherwise, return the error from the query
+    return { data: null, error };
+  }
+};
+
 // Convert database row to Project interface
 const dbRowToProject = (row: any, images: string[], videos: string[] = []): Project => ({
   id: row.id,
@@ -38,21 +61,39 @@ const projectToDbRow = (project: Omit<Project, 'id'> | Partial<Project>) => ({
 // Lightweight project list (for grids/lists - no images/videos)
 export const getProjectsList = async (): Promise<Project[]> => {
   try {
-    // Fetch only basic project info (no images/videos)
-    const { data: projects, error: projectsError } = await supabase
+    console.log('[getProjectsList] Starting fetch...');
+    const startTime = Date.now();
+    
+    // Fetch only basic project info (no images/videos) with timeout
+    const queryPromise = supabase
       .from('projects')
-      .select('*')
+      .select('id, title, title_en, tag, tag_en, description, description_en, cover_image, span_cols, span_rows, icon, created_at')
       .order('created_at', { ascending: false });
+    
+    const result = await withTimeout(queryPromise, 10000);
+    const { data: projects, error: projectsError } = result;
 
-    if (projectsError) throw projectsError;
-    if (!projects) return [];
+    const duration = Date.now() - startTime;
+    console.log(`[getProjectsList] Completed in ${duration}ms`);
 
+    if (projectsError) {
+      console.error('[getProjectsList] Error:', projectsError);
+      throw projectsError;
+    }
+    
+    if (!projects) {
+      console.warn('[getProjectsList] No projects returned');
+      return [];
+    }
+
+    console.log(`[getProjectsList] Fetched ${projects.length} projects`);
+    
     // Return projects with empty images/videos arrays (only cover image is needed)
     return projects.map((project) =>
       dbRowToProject(project, [], [])
     );
   } catch (error) {
-    console.error('Error fetching projects list:', error);
+    console.error('[getProjectsList] Fatal error:', error);
     throw error;
   }
 };
@@ -115,36 +156,41 @@ export const getProjects = async (): Promise<Project[]> => {
 
 export const getProject = async (id: string): Promise<Project | undefined> => {
   try {
-    // Fetch project
-    const { data: project, error: projectError } = await supabase
+    // Fetch project with timeout
+    const projectQuery = supabase
       .from('projects')
       .select('*')
       .eq('id', id)
       .single();
+    
+    const { data: project, error: projectError } = await withTimeout(projectQuery, 10000);
 
     if (projectError) throw projectError;
     if (!project) return undefined;
 
-    // Fetch project images
-    const { data: images, error: imagesError } = await supabase
+    // Fetch project images and videos in parallel with timeout
+    const imagesQuery = supabase
       .from('project_images')
       .select('image_url')
       .eq('project_id', id)
       .order('display_order', { ascending: true });
-
-    if (imagesError) throw imagesError;
-
-    // Fetch project videos
-    const { data: videos, error: videosError } = await supabase
+    
+    const videosQuery = supabase
       .from('project_videos')
       .select('video_url')
       .eq('project_id', id)
       .order('display_order', { ascending: true });
 
-    if (videosError) throw videosError;
+    const [imagesResult, videosResult] = await Promise.all([
+      withTimeout(imagesQuery, 10000),
+      withTimeout(videosQuery, 10000),
+    ]);
 
-    const imageUrls = images?.map((img) => img.image_url) || [];
-    const videoUrls = videos?.map((vid) => vid.video_url) || [];
+    if (imagesResult.error) throw imagesResult.error;
+    if (videosResult.error) throw videosResult.error;
+
+    const imageUrls = imagesResult.data?.map((img) => img.image_url) || [];
+    const videoUrls = videosResult.data?.map((vid) => vid.video_url) || [];
 
     return dbRowToProject(project, imageUrls, videoUrls);
   } catch (error) {
@@ -300,14 +346,26 @@ export const deleteProject = async (id: string): Promise<boolean> => {
 // Hero content
 export const getHeroContent = async (): Promise<HeroContent> => {
   try {
-    const { data, error } = await supabase
+    console.log('[getHeroContent] Starting fetch...');
+    const queryPromise = supabase
       .from('hero_content')
       .select('*')
       .single();
+    
+    const result = await withTimeout(queryPromise, 10000);
+    const { data, error } = result;
 
-    if (error) throw error;
-    if (!data) throw new Error('Hero content not found');
+    if (error) {
+      console.error('[getHeroContent] Error:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      console.error('[getHeroContent] No data returned');
+      throw new Error('Hero content not found');
+    }
 
+    console.log('[getHeroContent] Success');
     return {
       badge: data.badge,
       badgeEn: data.badge_en,
@@ -323,7 +381,7 @@ export const getHeroContent = async (): Promise<HeroContent> => {
       ctaSecondaryEn: data.cta_secondary_en,
     };
   } catch (error) {
-    console.error('Error fetching hero content:', error);
+    console.error('[getHeroContent] Fatal error:', error);
     throw error;
   }
 };
@@ -383,14 +441,26 @@ export const updateHeroContent = async (
 // Footer content
 export const getFooterContent = async (): Promise<FooterContent> => {
   try {
-    const { data, error } = await supabase
+    console.log('[getFooterContent] Starting fetch...');
+    const queryPromise = supabase
       .from('footer_content')
       .select('*')
       .single();
+    
+    const result = await withTimeout(queryPromise, 10000);
+    const { data, error } = result;
 
-    if (error) throw error;
-    if (!data) throw new Error('Footer content not found');
+    if (error) {
+      console.error('[getFooterContent] Error:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      console.error('[getFooterContent] No data returned');
+      throw new Error('Footer content not found');
+    }
 
+    console.log('[getFooterContent] Success');
     return {
       title: data.title,
       titleEn: data.title_en,
@@ -400,7 +470,7 @@ export const getFooterContent = async (): Promise<FooterContent> => {
       ctaEn: data.cta_en,
     };
   } catch (error) {
-    console.error('Error fetching footer content:', error);
+    console.error('[getFooterContent] Fatal error:', error);
     throw error;
   }
 };
