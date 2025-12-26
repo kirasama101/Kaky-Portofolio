@@ -5,6 +5,7 @@ import { getProject, Project } from "@/lib/database";
 import { useLanguage } from "@/i18n/LanguageContext";
 import Navbar from "@/components/Navbar";
 import DatabaseError from "@/components/DatabaseError";
+import ProjectGallery from "@/components/ProjectGallery";
 
 const ProjectPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -77,30 +78,16 @@ const ProjectPage = () => {
           )}
         </div>
 
-        <h2 className="text-xl font-bold mb-6">{t.project.gallery}</h2>
-
-        <div className="flex gap-5 overflow-x-auto pb-4">
-          {/* Render images */}
-          {project.images.map((img, index) => (
-            <img
-              key={`img-${index}`}
-              src={img}
-              alt={`${project.title} - ${index + 1}`}
-              className="h-[50vh] md:h-[60vh] w-auto object-contain rounded-xl shadow-lg shadow-white/10 flex-shrink-0"
+        {(project.images.length > 0 || (project.videos && project.videos.length > 0)) && (
+          <div className="mt-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-8">{t.project.gallery}</h2>
+            <ProjectGallery
+              images={project.images}
+              videos={project.videos}
+              projectTitle={isAr ? project.title : project.titleEn}
             />
-          ))}
-          {/* Render videos */}
-          {project.videos?.map((video, index) => (
-            <video
-              key={`vid-${index}`}
-              src={video}
-              controls
-              className="h-[50vh] md:h-[60vh] w-auto object-contain rounded-xl shadow-lg shadow-white/10 flex-shrink-0"
-            >
-              Your browser does not support the video tag.
-            </video>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
