@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getProjects, deleteProject, Project } from "@/lib/mockData";
+import { getProjects, deleteProject, Project } from "@/lib/database";
 import { toast } from "sonner";
 
 const AdminProjects = () => {

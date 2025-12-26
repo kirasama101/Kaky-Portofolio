@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getFooterContent, updateFooterContent, FooterContent } from "@/lib/mockData";
+import { getFooterContent, updateFooterContent, FooterContent } from "@/lib/database";
 import { toast } from "sonner";
 
 const AdminFooter = () => {

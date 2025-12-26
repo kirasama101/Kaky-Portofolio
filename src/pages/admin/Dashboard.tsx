@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Folder, Layout, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getProjects } from "@/lib/mockData";
+import { getProjects } from "@/lib/database";
 
 const Dashboard = () => {
   const { t } = useLanguage();

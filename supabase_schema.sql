@@ -36,6 +36,17 @@ CREATE TABLE IF NOT EXISTS project_images (
 );
 
 -- ============================================
+-- Project Videos Table
+-- ============================================
+CREATE TABLE IF NOT EXISTS project_videos (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
+  video_url TEXT NOT NULL,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================
 -- Hero Content Table
 -- ============================================
 CREATE TABLE IF NOT EXISTS hero_content (
@@ -76,6 +87,8 @@ CREATE TABLE IF NOT EXISTS footer_content (
 -- ============================================
 CREATE INDEX IF NOT EXISTS idx_project_images_project_id ON project_images(project_id);
 CREATE INDEX IF NOT EXISTS idx_project_images_display_order ON project_images(project_id, display_order);
+CREATE INDEX IF NOT EXISTS idx_project_videos_project_id ON project_videos(project_id);
+CREATE INDEX IF NOT EXISTS idx_project_videos_display_order ON project_videos(project_id, display_order);
 
 -- ============================================
 -- Function to update updated_at timestamp
@@ -111,6 +124,7 @@ CREATE TRIGGER update_footer_content_updated_at BEFORE UPDATE ON footer_content
 -- ============================================
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE project_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE project_videos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hero_content ENABLE ROW LEVEL SECURITY;
 ALTER TABLE footer_content ENABLE ROW LEVEL SECURITY;
 
@@ -120,6 +134,7 @@ ALTER TABLE footer_content ENABLE ROW LEVEL SECURITY;
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Projects are viewable by everyone" ON projects;
 DROP POLICY IF EXISTS "Project images are viewable by everyone" ON project_images;
+DROP POLICY IF EXISTS "Project videos are viewable by everyone" ON project_videos;
 DROP POLICY IF EXISTS "Hero content is viewable by everyone" ON hero_content;
 DROP POLICY IF EXISTS "Footer content is viewable by everyone" ON footer_content;
 
@@ -131,6 +146,11 @@ CREATE POLICY "Projects are viewable by everyone"
 -- Allow anyone to read project images
 CREATE POLICY "Project images are viewable by everyone"
   ON project_images FOR SELECT
+  USING (true);
+
+-- Allow anyone to read project videos
+CREATE POLICY "Project videos are viewable by everyone"
+  ON project_videos FOR SELECT
   USING (true);
 
 -- Allow anyone to read hero content
@@ -151,6 +171,7 @@ CREATE POLICY "Footer content is viewable by everyone"
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Projects are editable by admin" ON projects;
 DROP POLICY IF EXISTS "Project images are editable by admin" ON project_images;
+DROP POLICY IF EXISTS "Project videos are editable by admin" ON project_videos;
 DROP POLICY IF EXISTS "Hero content is editable by admin" ON hero_content;
 DROP POLICY IF EXISTS "Footer content is editable by admin" ON footer_content;
 
@@ -163,6 +184,12 @@ CREATE POLICY "Projects are editable by admin"
 -- Project Images - Admin only write access
 CREATE POLICY "Project images are editable by admin"
   ON project_images FOR ALL
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Project Videos - Admin only write access
+CREATE POLICY "Project videos are editable by admin"
+  ON project_videos FOR ALL
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
 

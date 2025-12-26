@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getFooterContent, FooterContent } from "@/lib/mockData";
+import { getFooterContent, FooterContent } from "@/lib/database";
 import DatabaseError from "./DatabaseError";
 
 const FooterCTA = () => {

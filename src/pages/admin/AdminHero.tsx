@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getHeroContent, updateHeroContent, HeroContent } from "@/lib/mockData";
+import { getHeroContent, updateHeroContent, HeroContent } from "@/lib/database";
 import { toast } from "sonner";
 
 const AdminHero = () => {

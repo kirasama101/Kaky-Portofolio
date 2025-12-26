@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getProject, createProject, updateProject, Project } from "@/lib/mockData";
+import { getProject, createProject, updateProject, Project } from "@/lib/database";
 import { processImageFiles, UploadedImage } from "@/lib/imageUpload";
 import { toast } from "sonner";
 
@@ -21,6 +21,7 @@ const AdminEditProject = () => {
     descriptionEn: "",
     coverImage: "",
     images: [] as string[],
+    videos: [] as string[],
     spanCols: 1,
     spanRows: 1,
     icon: "",
@@ -42,6 +43,7 @@ const AdminEditProject = () => {
             descriptionEn: project.descriptionEn || "",
             coverImage: project.coverImage,
             images: project.images,
+            videos: project.videos || [],
             spanCols: project.spanCols || 1,
             spanRows: project.spanRows || 1,
             icon: project.icon || "",
@@ -73,6 +75,34 @@ const AdminEditProject = () => {
     setForm((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const videoUrls = files.map((file) => URL.createObjectURL(file));
+      setForm((prev) => ({
+        ...prev,
+        videos: [...prev.videos, ...videoUrls],
+      }));
+    }
+  };
+
+  const handleVideoUrlAdd = () => {
+    const url = prompt("Enter video URL:");
+    if (url) {
+      setForm((prev) => ({
+        ...prev,
+        videos: [...prev.videos, url],
+      }));
+    }
+  };
+
+  const removeVideo = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      videos: prev.videos.filter((_, i) => i !== index),
     }));
   };
 
@@ -272,6 +302,48 @@ const AdminEditProject = () => {
               className="hidden"
             />
           </label>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Videos</label>
+          <div className="flex flex-wrap gap-4 mb-4">
+            {form.videos.map((video, index) => (
+              <div key={index} className="relative">
+                <video
+                  src={video}
+                  className="w-32 h-32 object-cover rounded-lg"
+                  controls
+                />
+                <button
+                  type="button"
+                  onClick={() => removeVideo(index)}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <label className="cursor-pointer flex items-center gap-2 px-4 py-3 bg-secondary border border-border rounded-lg hover:bg-secondary/80 w-fit">
+              <Upload size={20} />
+              <span>Upload Video</span>
+              <input
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={handleVideoUpload}
+                className="hidden"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={handleVideoUrlAdd}
+              className="px-4 py-3 bg-secondary border border-border rounded-lg hover:bg-secondary/80"
+            >
+              Add Video URL
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-4">

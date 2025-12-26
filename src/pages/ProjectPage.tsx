@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { getProject, Project } from "@/lib/mockData";
+import { getProject, Project } from "@/lib/database";
 import { useLanguage } from "@/i18n/LanguageContext";
 import Navbar from "@/components/Navbar";
 import DatabaseError from "@/components/DatabaseError";
@@ -80,13 +80,25 @@ const ProjectPage = () => {
         <h2 className="text-xl font-bold mb-6">{t.project.gallery}</h2>
 
         <div className="flex gap-5 overflow-x-auto pb-4">
+          {/* Render images */}
           {project.images.map((img, index) => (
             <img
-              key={index}
+              key={`img-${index}`}
               src={img}
               alt={`${project.title} - ${index + 1}`}
               className="h-[50vh] md:h-[60vh] w-auto object-contain rounded-xl shadow-lg shadow-white/10 flex-shrink-0"
             />
+          ))}
+          {/* Render videos */}
+          {project.videos?.map((video, index) => (
+            <video
+              key={`vid-${index}`}
+              src={video}
+              controls
+              className="h-[50vh] md:h-[60vh] w-auto object-contain rounded-xl shadow-lg shadow-white/10 flex-shrink-0"
+            >
+              Your browser does not support the video tag.
+            </video>
           ))}
         </div>
       </div>

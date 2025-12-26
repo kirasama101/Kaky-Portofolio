@@ -8,6 +8,7 @@ export interface Project {
   descriptionEn?: string;
   coverImage: string;
   images: string[];
+  videos?: string[];
   spanCols?: number;
   spanRows?: number;
   icon?: string;

@@ -1,6 +1,6 @@
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useEffect, useState } from "react";
-import { getHeroContent, HeroContent } from "@/lib/mockData";
+import { getHeroContent, HeroContent } from "@/lib/database";
 import DatabaseError from "./DatabaseError";
 
 const Hero = () => {

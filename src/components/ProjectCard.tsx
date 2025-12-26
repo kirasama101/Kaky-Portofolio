@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Project } from "@/lib/mockData";
+import { Project } from "@/lib/database";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 interface ProjectCardProps {
@@ -9,23 +10,52 @@ interface ProjectCardProps {
 const ProjectCard = ({ project }: ProjectCardProps) => {
   const { language } = useLanguage();
   const isAr = language === "ar";
+  const [isHovered, setIsHovered] = useState(false);
 
   const spanClass = `
     ${project.spanCols === 2 ? "md:col-span-2" : ""}
     ${project.spanRows === 2 ? "md:row-span-2 md:h-full" : ""}
   `;
 
+  const isGif = project.coverImage?.toLowerCase().endsWith('.gif') || project.coverImage?.toLowerCase().includes('.gif?');
+
   return (
     <Link
       to={`/project/${project.id}`}
       className={`group bg-card rounded-[20px] border border-border overflow-hidden relative cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:border-white/30 h-[250px] ${project.spanRows === 2 ? "md:h-[520px]" : ""} ${spanClass}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {project.coverImage ? (
-        <img
-          src={project.coverImage}
-          alt={isAr ? project.title : project.titleEn}
-          className="w-full h-full object-cover object-center transition-all duration-500 group-hover:scale-105 group-hover:opacity-80"
-        />
+        <>
+          {isGif ? (
+            <div className="relative w-full h-full">
+              {/* Static preview layer - browsers will show first frame when GIF is hidden */}
+              <div 
+                className="w-full h-full absolute inset-0 bg-cover bg-center transition-opacity duration-300"
+                style={{ 
+                  backgroundImage: `url(${project.coverImage})`,
+                  opacity: isHovered ? 0 : 1,
+                  backgroundPosition: 'center',
+                  backgroundSize: 'cover'
+                }}
+              />
+              {/* Animated GIF when hovered */}
+              <img
+                src={project.coverImage}
+                alt={isAr ? project.title : project.titleEn}
+                className="w-full h-full object-cover object-center absolute inset-0 transition-all duration-500 group-hover:scale-105"
+                style={{ opacity: isHovered ? 1 : 0 }}
+              />
+            </div>
+          ) : (
+            <img
+              src={project.coverImage}
+              alt={isAr ? project.title : project.titleEn}
+              className="w-full h-full object-cover object-center transition-all duration-500 group-hover:scale-105 group-hover:opacity-80"
+            />
+          )}
+        </>
       ) : (
         <div className="w-full h-full bg-black flex justify-center items-center">
           <span className="text-5xl">{project.icon || "📷"}</span>

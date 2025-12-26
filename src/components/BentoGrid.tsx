@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getProjects, Project } from "@/lib/mockData";
+import { getProjects, Project } from "@/lib/database";
 import ProjectCard from "./ProjectCard";
 import DatabaseError from "./DatabaseError";
 

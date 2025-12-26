@@ -10,11 +10,11 @@ const AdminLayout = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const user = await getCurrentUser();
-      if (!user) {
-        navigate("/admin/login");
+    if (!user) {
+      navigate("/admin/login");
       } else {
         setLoading(false);
-      }
+    }
     };
     checkAuth();
   }, [navigate]);
