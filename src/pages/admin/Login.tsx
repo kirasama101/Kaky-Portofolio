@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { loginUser } from "@/lib/supabaseClient";
 import { toast } from "sonner";
+import { ArrowLeft, Home } from "lucide-react";
 
 const Login = () => {
   const { t } = useLanguage();
@@ -70,6 +71,16 @@ const Login = () => {
               {loading ? "..." : t.admin.login}
             </button>
           </form>
+
+          <div className="mt-6 pt-6 border-t border-border">
+            <Link
+              to="/"
+              className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Home size={16} />
+              <span>Back to Home</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

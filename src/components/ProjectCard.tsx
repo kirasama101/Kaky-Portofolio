@@ -31,9 +31,9 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           {isGif ? (
             <div className="relative w-full h-full">
               {/* Static preview layer - browsers will show first frame when GIF is hidden */}
-              <div 
+              <div
                 className="w-full h-full absolute inset-0 bg-cover bg-center transition-opacity duration-300"
-                style={{ 
+                style={{
                   backgroundImage: `url(${project.coverImage})`,
                   opacity: isHovered ? 0 : 1,
                   backgroundPosition: 'center',
