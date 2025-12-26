@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getProjects, Project } from "@/lib/database";
+import { getProjectsList, Project } from "@/lib/database";
 import ProjectCard from "./ProjectCard";
 import DatabaseError from "./DatabaseError";
 
@@ -12,7 +12,7 @@ const BentoGrid = () => {
 
   useEffect(() => {
     setLoading(true);
-    getProjects()
+    getProjectsList()
       .then(setProjects)
       .catch((err) => {
         console.error("Error loading projects:", err);

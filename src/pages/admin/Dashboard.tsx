@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Folder, Layout, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getProjects } from "@/lib/database";
+import { getProjectsList } from "@/lib/database";
 
 const Dashboard = () => {
   const { t } = useLanguage();
   const [projectCount, setProjectCount] = useState(0);
 
   useEffect(() => {
-    getProjects().then((p) => setProjectCount(p.length));
+    getProjectsList().then((p) => setProjectCount(p.length));
   }, []);
 
   const cards = [

@@ -35,7 +35,29 @@ const projectToDbRow = (project: Omit<Project, 'id'> | Partial<Project>) => ({
   span_rows: project.spanRows || 1,
 });
 
-// Projects
+// Lightweight project list (for grids/lists - no images/videos)
+export const getProjectsList = async (): Promise<Project[]> => {
+  try {
+    // Fetch only basic project info (no images/videos)
+    const { data: projects, error: projectsError } = await supabase
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (projectsError) throw projectsError;
+    if (!projects) return [];
+
+    // Return projects with empty images/videos arrays (only cover image is needed)
+    return projects.map((project) =>
+      dbRowToProject(project, [], [])
+    );
+  } catch (error) {
+    console.error('Error fetching projects list:', error);
+    throw error;
+  }
+};
+
+// Full projects with all images and videos (for when you need full details)
 export const getProjects = async (): Promise<Project[]> => {
   try {
     // Fetch all projects
