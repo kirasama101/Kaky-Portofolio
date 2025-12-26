@@ -81,11 +81,13 @@ const ProjectPage = () => {
         {(project.images.length > 0 || (project.videos && project.videos.length > 0)) && (
           <div className="mt-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-8">{t.project.gallery}</h2>
-            <ProjectGallery
-              images={project.images}
-              videos={project.videos}
-              projectTitle={isAr ? project.title : project.titleEn}
-            />
+            <div style={{ contain: "layout style paint" }}>
+              <ProjectGallery
+                images={project.images}
+                videos={project.videos}
+                projectTitle={isAr ? project.title : project.titleEn}
+              />
+            </div>
           </div>
         )}
       </div>
