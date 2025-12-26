@@ -4,6 +4,26 @@ import type { Project, HeroContent, FooterContent } from './mockData';
 // Re-export types for convenience
 export type { Project, HeroContent, FooterContent };
 
+// Test Supabase connection
+export const testConnection = async (): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const { error } = await withTimeout(
+      supabase.from('projects').select('id').limit(1),
+      5000 // 5 second timeout for connection test
+    );
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+};
+
 // Timeout helper function for Supabase queries
 const withTimeout = async <T>(
   queryPromise: Promise<{ data: T | null; error: any }>,

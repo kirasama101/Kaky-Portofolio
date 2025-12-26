@@ -9,8 +9,9 @@ const FooterCTA = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadContent = () => {
     setLoading(true);
+    setError(null);
     getFooterContent()
       .then(setContent)
       .catch((err) => {
@@ -18,10 +19,14 @@ const FooterCTA = () => {
         setError(err.message || "Failed to load content");
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadContent();
   }, []);
 
   if (error) {
-    return <DatabaseError message={error} />;
+    return <DatabaseError message={error} onRetry={loadContent} />;
   }
 
   if (loading || !content) {

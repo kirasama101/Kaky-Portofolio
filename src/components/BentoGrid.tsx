@@ -10,8 +10,9 @@ const BentoGrid = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadProjects = () => {
     setLoading(true);
+    setError(null);
     getProjectsList()
       .then(setProjects)
       .catch((err) => {
@@ -19,10 +20,14 @@ const BentoGrid = () => {
         setError(err.message || "Failed to load projects");
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadProjects();
   }, []);
 
   if (error) {
-    return <DatabaseError message={error} />;
+    return <DatabaseError message={error} onRetry={loadProjects} />;
   }
 
   if (loading) {
